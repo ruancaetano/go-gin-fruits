@@ -31,6 +31,20 @@ type SearchFruitResponseDTO struct {
 	Results []*SearchFruitResponseResult
 }
 
+// MakeSearchFruitHandler generate handler function to http search fruit request
+// @Summary      Search fruits
+// @Description  Search fruits by name and status
+// @Tags         fruits
+// @Accept       json
+// @Produce      json
+// @Param		 name query string true "Fruit name"
+// @Param		 status query string true "Fruit status"
+// @Param		 offset query int false "Pagination offset" 1
+// @Param		 limit query int false "Pagination limit" 100
+// @Success		 200 {object} SearchFruitResponseResult
+// @Failure		 400 {object} error.HttpError
+// @Failure		 500 {object} error.HttpError
+// @Router       /fruits/search [get]
 func MakeSearchFruitHandler(u protocol.UseCase[*usecase.SearchFruitUseCaseInputDTO, *usecase.SearchFruitUseCaseOutputDTO]) gin.HandlerFunc {
 	return func(c *gin.Context) {
 

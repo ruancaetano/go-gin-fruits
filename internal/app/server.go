@@ -5,6 +5,9 @@ import (
 	"github.com/ruancaetano/go-gin-fruits/internal/domain/usecase"
 	"github.com/ruancaetano/go-gin-fruits/internal/infra/repository"
 	"github.com/ruancaetano/go-gin-fruits/internal/presentation/handler"
+
+	"github.com/swaggo/files"
+	"github.com/swaggo/gin-swagger"
 )
 
 type Server struct {
@@ -38,6 +41,8 @@ func (s *Server) setupRoutes(r *gin.Engine) {
 			"message": "pong",
 		})
 	})
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	r.GET("/fruits/search", handler.MakeSearchFruitHandler(searchFruitUseCase))
 	r.GET("/fruits/:id", handler.MakeGetFruitHandler(getFruitUseCase))

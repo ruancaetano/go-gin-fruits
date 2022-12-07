@@ -9,7 +9,6 @@ import (
 )
 
 type UpdateFruitRequestDTO struct {
-	Name     string  `json:"name"`
 	Quantity int     `json:"quantity"`
 	Price    float64 `json:"price"`
 }
@@ -25,6 +24,18 @@ type UpdateFruitResponseDTO struct {
 	Status    string    `json:"status"`
 }
 
+// MakeUpdateFruitHandler generate handler function to http update fruit request
+// @Summary      Update fruit
+// @Description  Update fruit quantity and price
+// @Tags         fruits
+// @Accept       json
+// @Produce      json
+// @Param		 id path string true "Fruit id"
+// @Param		 body body UpdateFruitRequestDTO true "Update request body DTO"
+// @Success		 200 {object} UpdateFruitResponseDTO
+// @Failure		 400 {object} error.HttpError
+// @Failure		 500 {object} error.HttpError
+// @Router       /fruits/{id} [put]
 func MakeUpdateFruitHandler(u protocol.UseCase[*usecase.UpdateFruitUseCaseInputDTO, *usecase.UpdateFruitUseCaseOutputDTO]) gin.HandlerFunc {
 	return func(c *gin.Context) {
 

@@ -25,6 +25,18 @@ type CreateFruitResponseDTO struct {
 	Status    string    `json:"status"`
 }
 
+// MakeCreateFruitHandler generate handler function to http create fruit request
+// @Summary      Create a fruit
+// @Description  Create a fruit
+// @Tags         fruits
+// @Accept       json
+// @Produce      json
+// @Param		 body body CreateFruitRequestDTO true "Create fruit request body"
+// @Param		 x-owner header string true "fruit owner"
+// @Success		 201 {object} CreateFruitResponseDTO
+// @Failure		 400 {object} error.HttpError
+// @Failure		 500 {object} error.HttpError
+// @Router       /fruits/ [post]
 func MakeCreateFruitHandler(u protocol.UseCase[*usecase.CreateFruitUseCaseInputDTO, *usecase.CreateFruitUseCaseOutputDTO]) gin.HandlerFunc {
 	return func(c *gin.Context) {
 

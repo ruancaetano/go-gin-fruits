@@ -19,6 +19,17 @@ type GetFruitResponseDTO struct {
 	Status    string    `json:"status"`
 }
 
+// MakeGetFruitHandler generate handler function to http get fruit by id request
+// @Summary      Get a fruit by id
+// @Description  Get a fruit by id
+// @Tags         fruits
+// @Accept       json
+// @Produce      json
+// @Param		 id path string true "Fruit id"
+// @Success		 200 {object} GetFruitResponseDTO
+// @Failure		 400 {object} error.HttpError
+// @Failure		 500 {object} error.HttpError
+// @Router       /fruits/{id} [get]
 func MakeGetFruitHandler(u protocol.UseCase[*usecase.GetFruitUseCaseInputDTO, *usecase.GetFruitUseCaseOutputDTO]) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")

@@ -19,6 +19,17 @@ type DeleteFruitResponseDTO struct {
 	Status    string    `json:"status"`
 }
 
+// MakeDeleteFruitHandler generate handler function to http delete fruit request
+// @Summary      Delete a fruit
+// @Description  Update fruit status to podrido
+// @Tags         fruits
+// @Accept       json
+// @Produce      json
+// @Param		 id path string true "Fruit id"
+// @Success		 200 {object} DeleteFruitResponseDTO
+// @Failure		 400 {object} error.HttpError
+// @Failure		 500 {object} error.HttpError
+// @Router       /fruits/{id} [delete]
 func MakeDeleteFruitHandler(u protocol.UseCase[*usecase.DeleteFruitUseCaseInputDTO, *usecase.DeleteFruitUseCaseOutputDTO]) gin.HandlerFunc {
 	return func(c *gin.Context) {
 

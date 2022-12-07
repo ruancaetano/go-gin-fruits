@@ -1,0 +1,293 @@
+definitions:
+  error.HttpError:
+    properties:
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+  handler.CreateFruitRequestDTO:
+    properties:
+      name:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: integer
+    type: object
+  handler.CreateFruitResponseDTO:
+    properties:
+      date_created:
+        type: string
+      date_last_updated:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      owner:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: integer
+      status:
+        type: string
+    type: object
+  handler.DeleteFruitResponseDTO:
+    properties:
+      date_created:
+        type: string
+      date_last_updated:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      owner:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: integer
+      status:
+        type: string
+    type: object
+  handler.GetFruitResponseDTO:
+    properties:
+      date_created:
+        type: string
+      date_last_updated:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      owner:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: integer
+      status:
+        type: string
+    type: object
+  handler.SearchFruitResponseResult:
+    properties:
+      date_created:
+        type: string
+      date_last_updated:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      owner:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: integer
+      status:
+        type: string
+    type: object
+  handler.UpdateFruitRequestDTO:
+    properties:
+      name:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: integer
+    type: object
+  handler.UpdateFruitResponseDTO:
+    properties:
+      date_created:
+        type: string
+      date_last_updated:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      owner:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: integer
+      status:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /fruits/:
+    post:
+      consumes:
+      - application/json
+      description: Create a fruit
+      parameters:
+      - description: Create fruit request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateFruitRequestDTO'
+      - description: fruit owner
+        in: header
+        name: x-owner
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handler.CreateFruitResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.HttpError'
+      summary: Create a fruit
+      tags:
+      - fruits
+  /fruits/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Update fruit status to podrido
+      parameters:
+      - description: Fruit id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.DeleteFruitResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.HttpError'
+      summary: Delete a fruit
+      tags:
+      - fruits
+    get:
+      consumes:
+      - application/json
+      description: Get a fruit by id
+      parameters:
+      - description: Fruit id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.GetFruitResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.HttpError'
+      summary: Get a fruit by id
+      tags:
+      - fruits
+    put:
+      consumes:
+      - application/json
+      description: Update fruit quantity and price
+      parameters:
+      - description: Fruit id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update request body DTO
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.UpdateFruitRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.UpdateFruitResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.HttpError'
+      summary: Update fruit
+      tags:
+      - fruits
+  /fruits/search:
+    get:
+      consumes:
+      - application/json
+      description: Search fruits by name and status
+      parameters:
+      - description: Fruit name
+        in: query
+        name: name
+        required: true
+        type: string
+      - description: Fruit status
+        in: query
+        name: status
+        required: true
+        type: string
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      - description: Pagination limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.SearchFruitResponseResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error.HttpError'
+      summary: Search fruits
+      tags:
+      - fruits
+swagger: "2.0"
