@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/gin-gonic/gin"
 	"github.com/ruancaetano/go-gin-fruits/internal/domain/entity"
 	"github.com/ruancaetano/go-gin-fruits/internal/domain/usecase"
 	error2 "github.com/ruancaetano/go-gin-fruits/internal/presentation/error"
@@ -31,11 +32,14 @@ func TestCraeteFruitHandler(t *testing.T) {
 		u := &CreateFruitUseCaseMock{}
 		h := handler.MakeCreateFruitHandler(u)
 
-		r := httptest.NewRequest("POST", "/fruits", nil)
 		rr := httptest.NewRecorder()
+		ctx, _ := gin.CreateTestContext(rr)
+
+		r := httptest.NewRequest("POST", "/fruits", nil)
+		ctx.Request = r
 
 		var response error2.HttpError
-		h(rr, r)
+		h(ctx)
 		err := json.Unmarshal([]byte(rr.Body.String()), &response)
 		if err != nil {
 			t.Error("Parse JSON Data Error")
@@ -50,12 +54,16 @@ func TestCraeteFruitHandler(t *testing.T) {
 		u := &CreateFruitUseCaseMock{}
 		u.On("Execute", mock.Anything, mock.Anything).Return(&usecase.CreateFruitUseCaseOutputDTO{}, errors.New("name is required"))
 		h := handler.MakeCreateFruitHandler(u)
+
+		rr := httptest.NewRecorder()
+		ctx, _ := gin.CreateTestContext(rr)
+
 		body := `{"name": "", "quantity": 1, "price": 10.10}`
 		r := httptest.NewRequest("POST", "/fruits", strings.NewReader(body))
-		rr := httptest.NewRecorder()
+		ctx.Request = r
 
 		var response error2.HttpError
-		h(rr, r)
+		h(ctx)
 		err := json.Unmarshal([]byte(rr.Body.String()), &response)
 		if err != nil {
 			t.Error("Parse JSON Data Error")
@@ -81,13 +89,17 @@ func TestCraeteFruitHandler(t *testing.T) {
 			Owner:     fruitMock.Owner,
 		}, nil)
 		h := handler.MakeCreateFruitHandler(u)
+
+		rr := httptest.NewRecorder()
+		ctx, _ := gin.CreateTestContext(rr)
+
 		body := `{"name": "uva", "quantity": 1, "price": 10.10}`
 		r := httptest.NewRequest("POST", "/fruits", strings.NewReader(body))
 		r.Header.Set("x-owner", "owner")
-		rr := httptest.NewRecorder()
+		ctx.Request = r
 
 		var response handler.CreateFruitResponseDTO
-		h(rr, r)
+		h(ctx)
 		err := json.Unmarshal([]byte(rr.Body.String()), &response)
 		if err != nil {
 			t.Error("Parse JSON Data Error")

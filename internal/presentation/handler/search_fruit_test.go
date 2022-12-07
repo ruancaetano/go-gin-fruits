@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/ruancaetano/go-gin-fruits/internal/domain/usecase"
 	error2 "github.com/ruancaetano/go-gin-fruits/internal/presentation/error"
@@ -32,18 +33,21 @@ func TestSearchFruitHandler(t *testing.T) {
 
 		h := handler.MakeSearchFruitHandler(u)
 
+		rr := httptest.NewRecorder()
+		ctx, _ := gin.CreateTestContext(rr)
+
 		r := httptest.NewRequest("GET", "/fruits/search", nil)
+
 		q := r.URL.Query()
 		q.Add("name", "")
 		q.Add("status", "status")
 		q.Add("offset", "1")
 		q.Add("limit", "100")
 		r.URL.RawQuery = q.Encode()
-
-		rr := httptest.NewRecorder()
+		ctx.Request = r
 
 		var response error2.HttpError
-		h(rr, r)
+		h(ctx)
 		err := json.Unmarshal([]byte(rr.Body.String()), &response)
 		if err != nil {
 			t.Error("Parse JSON Data Error")
@@ -85,6 +89,9 @@ func TestSearchFruitHandler(t *testing.T) {
 
 		h := handler.MakeSearchFruitHandler(u)
 
+		rr := httptest.NewRecorder()
+		ctx, _ := gin.CreateTestContext(rr)
+
 		r := httptest.NewRequest("GET", "/fruits/search", nil)
 		q := r.URL.Query()
 		q.Add("name", "fruit")
@@ -92,11 +99,10 @@ func TestSearchFruitHandler(t *testing.T) {
 		q.Add("offset", "1")
 		q.Add("limit", "100")
 		r.URL.RawQuery = q.Encode()
-
-		rr := httptest.NewRecorder()
+		ctx.Request = r
 
 		var response handler.SearchFruitResponseDTO
-		h(rr, r)
+		h(ctx)
 		err := json.Unmarshal([]byte(rr.Body.String()), &response)
 		if err != nil {
 			t.Error("Parse JSON Data Error")

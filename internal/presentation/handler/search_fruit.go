@@ -1,10 +1,9 @@
 package handler
 
 import (
-	"encoding/json"
+	"github.com/gin-gonic/gin"
 	"github.com/ruancaetano/go-gin-fruits/internal/domain/protocol"
 	"github.com/ruancaetano/go-gin-fruits/internal/domain/usecase"
-	error2 "github.com/ruancaetano/go-gin-fruits/internal/presentation/error"
 	"net/http"
 	"strconv"
 	"time"
@@ -32,22 +31,21 @@ type SearchFruitResponseDTO struct {
 	Results []*SearchFruitResponseResult
 }
 
-func MakeSearchFruitHandler(u protocol.UseCase[*usecase.SearchFruitUseCaseInputDTO, *usecase.SearchFruitUseCaseOutputDTO]) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		query := r.URL.Query()
+func MakeSearchFruitHandler(u protocol.UseCase[*usecase.SearchFruitUseCaseInputDTO, *usecase.SearchFruitUseCaseOutputDTO]) gin.HandlerFunc {
+	return func(c *gin.Context) {
 
-		name := query.Get("name")
-		status := query.Get("status")
+		name := c.Query("name")
+		status := c.Query("status")
 
 		var offset int64
 		var limit int64
 		var err error
 
-		if offset, err = strconv.ParseInt(query.Get("offset"), 10, 64); err != nil {
+		if offset, err = strconv.ParseInt(c.Query("offset"), 10, 64); err != nil {
 			offset = 0
 		}
 
-		if limit, err = strconv.ParseInt(query.Get("limit"), 10, 64); err != nil {
+		if limit, err = strconv.ParseInt(c.Query("limit"), 10, 64); err != nil {
 			limit = 0
 		}
 
@@ -58,15 +56,13 @@ func MakeSearchFruitHandler(u protocol.UseCase[*usecase.SearchFruitUseCaseInputD
 			Limit:  int(limit),
 		}
 
-		output, err := u.Execute(r.Context(), input)
+		output, err := u.Execute(c.Request.Context(), input)
 
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			resp, _ := json.Marshal(error2.HttpError{
-				Message: err.Error(),
-				Status:  http.StatusBadRequest,
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": err.Error(),
+				"status":  http.StatusBadRequest,
 			})
-			w.Write(resp)
 			return
 		}
 
@@ -92,8 +88,7 @@ func MakeSearchFruitHandler(u protocol.UseCase[*usecase.SearchFruitUseCaseInputD
 			},
 			Results: mappedResults,
 		}
-		w.WriteHeader(http.StatusOK)
-		responseJson, _ := json.Marshal(response)
-		w.Write(responseJson)
+
+		c.JSON(http.StatusOK, response)
 	}
 }

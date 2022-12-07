@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/gin-gonic/gin"
 	"github.com/ruancaetano/go-gin-fruits/internal/domain/entity"
 	"github.com/ruancaetano/go-gin-fruits/internal/domain/usecase"
 	error2 "github.com/ruancaetano/go-gin-fruits/internal/presentation/error"
@@ -32,13 +33,17 @@ func TestUpdateFruitHandler(t *testing.T) {
 		u := &UpdateFruitUseCaseMock{}
 		h := handler.MakeUpdateFruitHandler(u)
 
-		r := httptest.NewRequest("PUT", "/fruits/{id}", nil)
 		rr := httptest.NewRecorder()
+		ctx, _ := gin.CreateTestContext(rr)
+		ctx.Params = []gin.Param{
+			{Key: "id", Value: ""},
+		}
 
-		r = r.WithContext(context.WithValue(r.Context(), "id", ""))
+		r := httptest.NewRequest("PUT", "/fruits/{id}", nil)
+		ctx.Request = r
 
 		var response error2.HttpError
-		h(rr, r)
+		h(ctx)
 		err := json.Unmarshal([]byte(rr.Body.String()), &response)
 		if err != nil {
 			t.Error("Parse JSON Data Error")
@@ -53,13 +58,17 @@ func TestUpdateFruitHandler(t *testing.T) {
 		u := &UpdateFruitUseCaseMock{}
 		h := handler.MakeUpdateFruitHandler(u)
 
-		r := httptest.NewRequest("PUT", "/fruits/{id}", nil)
 		rr := httptest.NewRecorder()
+		ctx, _ := gin.CreateTestContext(rr)
+		ctx.Params = []gin.Param{
+			{Key: "id", Value: "some-uuid"},
+		}
 
-		r = r.WithContext(context.WithValue(r.Context(), "id", "some-uuid"))
+		r := httptest.NewRequest("PUT", "/fruits/{id}", nil)
+		ctx.Request = r
 
 		var response error2.HttpError
-		h(rr, r)
+		h(ctx)
 		err := json.Unmarshal([]byte(rr.Body.String()), &response)
 		if err != nil {
 			t.Error("Parse JSON Data Error")
@@ -75,14 +84,18 @@ func TestUpdateFruitHandler(t *testing.T) {
 		u.On("Execute", mock.Anything, mock.Anything).Return(&usecase.UpdateFruitUseCaseOutputDTO{}, errors.New("quantity must be greater than zero"))
 		h := handler.MakeUpdateFruitHandler(u)
 
+		rr := httptest.NewRecorder()
+		ctx, _ := gin.CreateTestContext(rr)
+		ctx.Params = []gin.Param{
+			{Key: "id", Value: "some-uuid"},
+		}
+
 		body := `{"quantity": 0, "price": 10.10}`
 		r := httptest.NewRequest("PUT", "/fruits/{id}", strings.NewReader(body))
-		rr := httptest.NewRecorder()
-
-		r = r.WithContext(context.WithValue(r.Context(), "id", "some-uuid"))
+		ctx.Request = r
 
 		var response error2.HttpError
-		h(rr, r)
+		h(ctx)
 		err := json.Unmarshal([]byte(rr.Body.String()), &response)
 		if err != nil {
 			t.Error("Parse JSON Data Error")
@@ -109,15 +122,18 @@ func TestUpdateFruitHandler(t *testing.T) {
 		}, nil)
 		h := handler.MakeUpdateFruitHandler(u)
 
+		rr := httptest.NewRecorder()
+		ctx, _ := gin.CreateTestContext(rr)
+		ctx.Params = []gin.Param{
+			{Key: "id", Value: "some-uuid"},
+		}
+
 		body := `{"quantity": 100, "price": 100.0}`
 		r := httptest.NewRequest("PUT", "/fruits/{id}", strings.NewReader(body))
-		r.Header.Set("x-owner", "owner")
-		rr := httptest.NewRecorder()
-
-		r = r.WithContext(context.WithValue(r.Context(), "id", "some-uuid"))
+		ctx.Request = r
 
 		var response handler.UpdateFruitResponseDTO
-		h(rr, r)
+		h(ctx)
 		err := json.Unmarshal([]byte(rr.Body.String()), &response)
 		if err != nil {
 			t.Error("Parse JSON Data Error")

@@ -1,10 +1,9 @@
 package handler
 
 import (
-	"encoding/json"
+	"github.com/gin-gonic/gin"
 	"github.com/ruancaetano/go-gin-fruits/internal/domain/protocol"
 	"github.com/ruancaetano/go-gin-fruits/internal/domain/usecase"
-	error2 "github.com/ruancaetano/go-gin-fruits/internal/presentation/error"
 	"net/http"
 	"time"
 )
@@ -26,22 +25,20 @@ type CreateFruitResponseDTO struct {
 	Status    string    `json:"status"`
 }
 
-func MakeCreateFruitHandler(u protocol.UseCase[*usecase.CreateFruitUseCaseInputDTO, *usecase.CreateFruitUseCaseOutputDTO]) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func MakeCreateFruitHandler(u protocol.UseCase[*usecase.CreateFruitUseCaseInputDTO, *usecase.CreateFruitUseCaseOutputDTO]) gin.HandlerFunc {
+	return func(c *gin.Context) {
 
 		body := &CreateFruitRequestDTO{}
-		err := json.NewDecoder(r.Body).Decode(body)
+		err := c.BindJSON(body)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			resp, _ := json.Marshal(error2.HttpError{
-				Message: "invalid request body",
-				Status:  http.StatusBadRequest,
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "invalid request body",
+				"status":  http.StatusBadRequest,
 			})
-			w.Write(resp)
 			return
 		}
 
-		owner := r.Header.Get("x-owner")
+		owner := c.GetHeader("x-owner")
 
 		input := &usecase.CreateFruitUseCaseInputDTO{
 			Name:     body.Name,
@@ -50,15 +47,13 @@ func MakeCreateFruitHandler(u protocol.UseCase[*usecase.CreateFruitUseCaseInputD
 			Owner:    owner,
 		}
 
-		output, err := u.Execute(r.Context(), input)
+		output, err := u.Execute(c.Request.Context(), input)
 
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			resp, _ := json.Marshal(error2.HttpError{
-				Message: err.Error(),
-				Status:  http.StatusBadRequest,
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": err.Error(),
+				"status":  http.StatusBadRequest,
 			})
-			w.Write(resp)
 			return
 		}
 
@@ -72,9 +67,6 @@ func MakeCreateFruitHandler(u protocol.UseCase[*usecase.CreateFruitUseCaseInputD
 			Price:     output.Price,
 			Quantity:  output.Quantity,
 		}
-
-		w.WriteHeader(http.StatusCreated)
-		responseJson, _ := json.Marshal(response)
-		w.Write(responseJson)
+		c.JSON(http.StatusCreated, response)
 	}
 }

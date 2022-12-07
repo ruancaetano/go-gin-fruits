@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/gin-gonic/gin"
 	"github.com/ruancaetano/go-gin-fruits/internal/domain/entity"
 	"github.com/ruancaetano/go-gin-fruits/internal/domain/usecase"
 	error2 "github.com/ruancaetano/go-gin-fruits/internal/presentation/error"
@@ -30,13 +31,17 @@ func TestGetFruitHandler(t *testing.T) {
 		u := &GetFruitUseCaseMock{}
 		h := handler.MakeGetFruitHandler(u)
 
-		r := httptest.NewRequest("GET", "/fruits/{id}", nil)
 		rr := httptest.NewRecorder()
+		ctx, _ := gin.CreateTestContext(rr)
+		ctx.Params = []gin.Param{
+			{Key: "id", Value: ""},
+		}
 
-		r = r.WithContext(context.WithValue(r.Context(), "id", ""))
+		r := httptest.NewRequest("GET", "/fruits/{id}", nil)
+		ctx.Request = r
 
 		var response error2.HttpError
-		h(rr, r)
+		h(ctx)
 		err := json.Unmarshal([]byte(rr.Body.String()), &response)
 		if err != nil {
 			t.Error("Parse JSON Data Error")
@@ -53,13 +58,20 @@ func TestGetFruitHandler(t *testing.T) {
 
 		h := handler.MakeGetFruitHandler(u)
 
-		r := httptest.NewRequest("GET", "/fruits/{id}", nil)
 		rr := httptest.NewRecorder()
+		ctx, _ := gin.CreateTestContext(rr)
+		ctx.Params = []gin.Param{
+			{
+				Key:   "id",
+				Value: "some-uuid",
+			},
+		}
 
-		r = r.WithContext(context.WithValue(r.Context(), "id", "some-uuid"))
+		r := httptest.NewRequest("GET", "/fruits/{id}", nil)
+		ctx.Request = r
 
 		var response error2.HttpError
-		h(rr, r)
+		h(ctx)
 		err := json.Unmarshal([]byte(rr.Body.String()), &response)
 		if err != nil {
 			t.Error("Parse JSON Data Error")
@@ -97,13 +109,20 @@ func TestGetFruitHandler(t *testing.T) {
 
 		h := handler.MakeGetFruitHandler(u)
 
-		r := httptest.NewRequest("GET", "/fruits/{id}", nil)
 		rr := httptest.NewRecorder()
+		ctx, _ := gin.CreateTestContext(rr)
+		ctx.Params = []gin.Param{
+			{
+				Key:   "id",
+				Value: "some-uuid",
+			},
+		}
 
-		r = r.WithContext(context.WithValue(r.Context(), "id", fruitMock.ID))
+		r := httptest.NewRequest("GET", "/fruits/{id}", nil)
+		ctx.Request = r
 
 		var response handler.GetFruitResponseDTO
-		h(rr, r)
+		h(ctx)
 		err := json.Unmarshal([]byte(rr.Body.String()), &response)
 		if err != nil {
 			t.Error("Parse JSON Data Error")

@@ -1,10 +1,9 @@
 package handler
 
 import (
-	"encoding/json"
+	"github.com/gin-gonic/gin"
 	"github.com/ruancaetano/go-gin-fruits/internal/domain/protocol"
 	"github.com/ruancaetano/go-gin-fruits/internal/domain/usecase"
-	error2 "github.com/ruancaetano/go-gin-fruits/internal/presentation/error"
 	"net/http"
 	"time"
 )
@@ -20,17 +19,15 @@ type DeleteFruitResponseDTO struct {
 	Status    string    `json:"status"`
 }
 
-func MakeDeleteFruitHandler(u protocol.UseCase[*usecase.DeleteFruitUseCaseInputDTO, *usecase.DeleteFruitUseCaseOutputDTO]) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func MakeDeleteFruitHandler(u protocol.UseCase[*usecase.DeleteFruitUseCaseInputDTO, *usecase.DeleteFruitUseCaseOutputDTO]) gin.HandlerFunc {
+	return func(c *gin.Context) {
 
-		id := r.Context().Value("id").(string)
+		id := c.Param("id")
 		if id == "" {
-			w.WriteHeader(http.StatusBadRequest)
-			resp, _ := json.Marshal(error2.HttpError{
-				Message: "invalid request param",
-				Status:  http.StatusBadRequest,
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "invalid request param",
+				"status":  http.StatusBadRequest,
 			})
-			w.Write(resp)
 			return
 		}
 
@@ -38,15 +35,13 @@ func MakeDeleteFruitHandler(u protocol.UseCase[*usecase.DeleteFruitUseCaseInputD
 			ID: id,
 		}
 
-		output, err := u.Execute(r.Context(), input)
+		output, err := u.Execute(c.Request.Context(), input)
 
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			resp, _ := json.Marshal(error2.HttpError{
-				Message: err.Error(),
-				Status:  http.StatusBadRequest,
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": err.Error(),
+				"status":  http.StatusBadRequest,
 			})
-			w.Write(resp)
 			return
 		}
 
@@ -60,9 +55,6 @@ func MakeDeleteFruitHandler(u protocol.UseCase[*usecase.DeleteFruitUseCaseInputD
 			Price:     output.Price,
 			Quantity:  output.Quantity,
 		}
-
-		w.WriteHeader(http.StatusOK)
-		responseJson, _ := json.Marshal(response)
-		w.Write(responseJson)
+		c.JSON(http.StatusOK, response)
 	}
 }
