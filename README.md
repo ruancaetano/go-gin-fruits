@@ -14,7 +14,7 @@ docker compose up -d
 
 After that the swagger will be accessible at `http://localhost:8080/swagger/index.html`
 
-### To run tests
+### To run unit tests
 
 ```sh
 docker compose up -d
@@ -22,4 +22,15 @@ docker compose up -d
 
 ```sh
 docker exec go-gin-fruits go test ./... -v
+```
+
+
+### To run e2e tests
+
+```sh
+docker compose up -d
+```
+
+```sh
+ docker exec go-gin-fruits sh -c "cd e2e && godog run"
 ```
