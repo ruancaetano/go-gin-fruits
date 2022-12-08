@@ -1,4 +1,4 @@
-package main
+package main_test
 
 import (
 	apicontext "github.com/brpaz/godog-api-context"
@@ -13,6 +13,11 @@ func InitializeScenario(s *godog.ScenarioContext) {
 }
 
 func TestFeatures(t *testing.T) {
+
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+		return
+	}
 
 	suite := godog.TestSuite{
 		ScenarioInitializer: InitializeScenario,

@@ -23,7 +23,7 @@ docker compose up -d
 ```
 
 ```sh
-docker exec go-gin-fruits go test ./... -v
+docker exec go-gin-fruits go test ./... -v -short
 ```
 
 
